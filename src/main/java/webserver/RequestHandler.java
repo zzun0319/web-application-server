@@ -26,12 +26,7 @@ public class RequestHandler extends Thread {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
-        		InputStreamReader isr = new InputStreamReader(in);
-        		BufferedReader br = new BufferedReader(isr);
-        		String requestLine = "";
-        		while((requestLine = br.readLine()) != null || !"".equals(requestLine = br.readLine())) {
-        			log.info("{}\n", requestLine);
-        		}
+        		requestInfoPrint(in);
         	
             DataOutputStream dos = new DataOutputStream(out);
             byte[] body = "Hello World~~~!!!".getBytes();
@@ -41,6 +36,16 @@ public class RequestHandler extends Thread {
             log.error(e.getMessage());
         }
     }
+
+	private void requestInfoPrint(InputStream in) throws IOException {
+		InputStreamReader isr = new InputStreamReader(in);
+		BufferedReader br = new BufferedReader(isr);
+		String requestLine = "";
+		while((requestLine = br.readLine()) != null) {
+			if(requestLine.equals("")) break;
+			log.info("{}\n", requestLine);
+		}
+	}
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
         try {
