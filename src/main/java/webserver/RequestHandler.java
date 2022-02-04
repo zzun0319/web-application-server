@@ -28,7 +28,7 @@ public class RequestHandler extends Thread {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
         		InputStreamReader isr = new InputStreamReader(in);
         		BufferedReader br = new BufferedReader(isr);
-        		String requestLine = "";
+        		String requestLine = ""; 
         		while((requestLine = br.readLine()) != null || !"".equals(requestLine = br.readLine())) {
         			log.info("{}\n", requestLine);
         		}
