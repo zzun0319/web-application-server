@@ -39,14 +39,15 @@ public class RequestHandler extends Thread {
         		// 요청 정보 출력
 	        	BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
 	    		String line = br.readLine();
-	    		log.debug("request line : {}", line);
+	    		log.debug("###### request line : {} ######", line);
 	    		
 	    		if(line == null) return;
 	    		
 	    		String[] tokens = line.split(" ");
 	    		String method = tokens[0];
 	    		int contentLength = 0;
-	    		String cookie = "";
+	    		boolean logined = false;
+	    		String accept = "";
 	    		
 	    		while(!line.equals("")) {
 	    			log.debug("header: {}", line);
@@ -55,7 +56,11 @@ public class RequestHandler extends Thread {
 	    				contentLength = getContentLength(line);
 	    			}
 	    			if(line.contains("Cookie")) {
-	    				cookie = getCookie(line);
+	    				logined = getLogined(line);
+	    			}
+	    			if(line.contains("Accept: ")) {
+	    				accept = getAccept(line);
+	    				log.debug("@@@@@@@@ Accept: {} @@@@@@@@", accept);
 	    			}
 	    		}
 	    		// 여기까지 br이 ""까지 읽음. Header와 Body사이의 ""
@@ -81,18 +86,18 @@ public class RequestHandler extends Thread {
 	    			Map<String, String> params = HttpRequestUtils.parseQueryString(body);
 	    			User findUser = DataBase.findUserById(params.get("userId"));
 	    			DataOutputStream dos = new DataOutputStream(out);
+	    			if(findUser == null) loginResponse(dos, "false");
 	    			if(findUser.getPassword().equals(params.get("password"))) {
-	    				loginResponse(dos, true);
+	    				loginResponse(dos, "true");
 	    			} else {
-	    				loginResponse(dos, false);
+	    				loginResponse(dos, "false");
 	    			}
 	    		} else if("/user/list".equals(url)) {
 	    			
-	    			Map<String, String> cookieMap = HttpRequestUtils.parseCookies(cookie);
-	    			String logined = cookieMap.get("logined");
+	    			
 	    			DataOutputStream dos = new DataOutputStream(out);
 	    			
-	    			if(logined != null && logined.equals("true")) {
+	    			if(logined) {
 	    				
 	    				String result = "";
 	    				for (User u : DataBase.findAll()) {
@@ -100,7 +105,7 @@ public class RequestHandler extends Thread {
 	    					result += tmpUser;
 					}
 	    				byte[] body = result.getBytes();
-	    				response200Header(dos, body.length);
+	    				response200Header(dos, body.length, accept);
 		    			responseBody(dos, body);
 	    				
 	    			} else {
@@ -111,7 +116,7 @@ public class RequestHandler extends Thread {
 	    			
 	    			DataOutputStream dos = new DataOutputStream(out);
 	    			byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
-	    			response200Header(dos, body.length);
+	    			response200Header(dos, body.length, accept);
 	    			responseBody(dos, body);
 	    		}
 	    		
@@ -120,12 +125,17 @@ public class RequestHandler extends Thread {
         }
     }
 
-	private void loginResponse(DataOutputStream dos, boolean isSuccess) {
+	private String getAccept(String line) {
+		String[] headerTokens = line.split(":");
+		return headerTokens[1].trim();
+	}
+
+	private void loginResponse(DataOutputStream dos, String isSuccess) {
 		try {
 		    dos.writeBytes("HTTP/1.1 302 Found \r\n");
 		    dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
 		    dos.writeBytes("Set-Cookie: logined=" + isSuccess + "\r\n");
-		    if(isSuccess) dos.writeBytes("Location: /index.html");
+		    if(isSuccess.equals("true")) dos.writeBytes("Location: /index.html");
 		    else dos.writeBytes("Location: /user/login_failed.html");
 		    dos.writeBytes("\r\n");
 		} catch (IOException e) {
@@ -143,9 +153,13 @@ public class RequestHandler extends Thread {
 		}
 	}
 	
-	private String getCookie(String line) {
+	private boolean getLogined(String line) {
 		String[] headerTokens = line.split(":");
-		return headerTokens[1].trim();
+		String cookies = headerTokens[1].trim();
+		Map<String, String> cookieMap = HttpRequestUtils.parseCookies(cookies);
+		String logined = cookieMap.get("logined");
+		if(logined == null) return false;
+		return Boolean.parseBoolean(logined);
 	}
 
 	private int getContentLength(String line) {
@@ -192,10 +206,11 @@ public class RequestHandler extends Thread {
 		return requestUrl;
 	}
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String accept) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            if(accept.contains("text/css")) dos.writeBytes("Content-Type: text/css;\r\n");
+            else dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
