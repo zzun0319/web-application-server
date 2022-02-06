@@ -55,6 +55,7 @@ public class HttpRequestUtils {
     
     public static String getRequestUrl(String requestUrl) {
     		String[] parts = requestUrl.split(" ");
+    		System.out.println(parts[1]);
     		return parts[1];
     }
 

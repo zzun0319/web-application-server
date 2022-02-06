@@ -33,4 +33,23 @@ public class User {
     public String toString() {
         return "User [userId=" + userId + ", password=" + password + ", name=" + name + ", email=" + email + "]";
     }
+    
+    @Override
+    public boolean equals(Object obj) {
+    	
+    	String userId = "";
+    	String password = "";
+    	String name = "";
+    	String email = "";
+    	
+    	if (obj instanceof User) {
+			User user = (User) obj;
+			userId = user.getUserId();
+			password = user.getPassword();
+			name = user.getName();
+			email = user.getEmail();
+		}
+    	
+    	return this.userId.equals(userId) && this.password.equals(password) && this.name.equals(name) && this.email.equals(email);
+    }
 }
