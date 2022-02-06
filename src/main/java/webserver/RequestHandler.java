@@ -57,68 +57,61 @@ public class RequestHandler extends Thread {
 	    		// 여기까지 br이 ""까지 읽음. Header와 Body사이의 ""
 	    		// 그럼 다음 readLine을 하게되면 "" 아래의 Request Body를 읽게 됨. 또는 Content-Length만큼 읽어들이면 Body를 읽을 수 있음.
 	    		
-	    		DataOutputStream dos = new DataOutputStream(out);
+	    		
 	    		
 	    		String url = tokens[1];
 	    		if("/user/create".equals(url)){
-//	    			int index = url.indexOf("?");
-//	    			String queryString = url.substring(index + 1);
 	    			
-	    			String body = IOUtils.readData(br, contentLength);
-	    			
-	    			Map<String, String> params = HttpRequestUtils.parseQueryString(body);
+	    			String requestBody = IOUtils.readData(br, contentLength);
+	    			log.debug("Request Body: {}", requestBody);
+	    			Map<String, String> params = HttpRequestUtils.parseQueryString(requestBody);
 	    			User user = new User(params.get("userId"), params.get("password"), params.get("name"), params.get("email"));
 	    			log.debug("User : {}", user);
+	    			DataOutputStream dos = new DataOutputStream(out);
 	    			DataBase.addUser(user);
-	    			url = "/index.html";
+	    			response302Header(dos);
 	    			
 	    		} else if("/user/login".equals(url)) {
 	    			
 	    			String body = IOUtils.readData(br, contentLength);
 	    			Map<String, String> params = HttpRequestUtils.parseQueryString(body);
 	    			User findUser = DataBase.findUserById(params.get("userId"));
+	    			DataOutputStream dos = new DataOutputStream(out);
 	    			if(findUser.getPassword().equals(params.get("password"))) {
-	    				loginResponse(dos, "true");
-	    				url = "/index.html";
+	    				loginResponse(dos, true);
 	    			} else {
-	    				loginResponse(dos, "false");
-	    				url = "/user/login_failed.html";
+	    				loginResponse(dos, false);
 	    			}
+	    		} else {
+	    			
+	    			DataOutputStream dos = new DataOutputStream(out);
+	    			byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
+	    			response200Header(dos, body.length);
+	    			responseBody(dos, body);
 	    		}
-	    		
-    			byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
-    			
-    			if(method.equals("POST")) {
-    				response302Header(url, dos, body);
-    				responseBody(dos, body);
-    			} else {
-    				response200Header(dos, body.length);
-    				responseBody(dos, body);
-    			}
-    			
 	    		
         } catch (IOException e) {
             log.error(e.getMessage());
         }
     }
 
-	private void loginResponse(DataOutputStream dos, String isSuccess) {
+	private void loginResponse(DataOutputStream dos, boolean isSuccess) {
 		try {
-		    dos.writeBytes("HTTP/1.1 200 OK \r\n");
+		    dos.writeBytes("HTTP/1.1 302 Found \r\n");
 		    dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
 		    dos.writeBytes("Set-Cookie: logined=" + isSuccess + "\r\n");
+		    if(isSuccess) dos.writeBytes("Location: /index.html");
+		    else dos.writeBytes("Location: /user/login_failed.html");
 		    dos.writeBytes("\r\n");
 		} catch (IOException e) {
 		    log.error(e.getMessage());
 		}
 	}
 
-	private void response302Header(String url, DataOutputStream dos, byte[] body) {
+	private void response302Header(DataOutputStream dos) {
 		try {
 		    dos.writeBytes("HTTP/1.1 302 Found \r\n");
-		    dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-		    dos.writeBytes("Content-Length: " + body.length + "\r\n");
-		    dos.writeBytes("Location: " + url + "\r\n");
+		    dos.writeBytes("Location: /index.html\r\n");
 		    dos.writeBytes("\r\n");
 		} catch (IOException e) {
 		    log.error(e.getMessage());
