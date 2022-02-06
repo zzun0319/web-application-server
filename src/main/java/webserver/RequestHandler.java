@@ -74,24 +74,28 @@ public class RequestHandler extends Thread {
     			DataOutputStream dos = new DataOutputStream(out);
     			byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
     			if(method.equals("POST")) {
-    				try {
-    		            dos.writeBytes("HTTP/1.1 302 found \r\n");
-    		            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-    		            dos.writeBytes("Content-Length: " + body.length + "\r\n");
-    		            dos.writeBytes("Location: " + url + "\r\n");
-    		            dos.writeBytes("\r\n");
-    		        } catch (IOException e) {
-    		            log.error(e.getMessage());
-    		        }
+    				response302Header(url, dos, body);
     			} else {
     				response200Header(dos, body.length);
+    				responseBody(dos, body);
     			}
-    			responseBody(dos, body);
-	    		
+    			
         } catch (IOException e) {
             log.error(e.getMessage());
         }
     }
+
+	private void response302Header(String url, DataOutputStream dos, byte[] body) {
+		try {
+		    dos.writeBytes("HTTP/1.1 302 Found \r\n");
+		    dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+		    dos.writeBytes("Content-Length: " + body.length + "\r\n");
+		    dos.writeBytes("Location: " + url + "\r\n");
+		    dos.writeBytes("\r\n");
+		} catch (IOException e) {
+		    log.error(e.getMessage());
+		}
+	}
 
 	private int getContentLength(String line) {
 		String[] headerTokens = line.split(":");
