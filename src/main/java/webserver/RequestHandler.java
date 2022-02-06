@@ -2,13 +2,13 @@ package webserver;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -35,26 +35,21 @@ public class RequestHandler extends Thread {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
         	
         		// 요청 정보 출력
-        		String requestUrl = requestInfoPrint(in);
-        		
-        		// 요청 url 분리
-    			requestUrl = HttpRequestUtils.getRequestUrl(requestUrl);
-    			log.info("########################{}###########################", requestUrl);
-    			
-    			// 회원 가입(GET)
-//    			requestUrl = joinGetMethod(requestUrl);
-    			
-    			// 회원가입(POST)
-    			String reqBody = extractBodyFromReq(in, requestUrl);
-    			Map<String, String> paramMap = paramSplitAndJoin(reqBody);
-    			log.info("{}의 회원가입 완료", paramMap.get("userId"));
-        		
-        		// 분리한 리소스 위치의 파일 읽기
-        		byte[] body = Files.readAllBytes(Paths.get("./webapp" + requestUrl));
-//        		byte[] body = Files.readAllBytes(new File("./webapp" + requestUrl).toPath()); 이렇게도 되네
-        		
+	        	BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+	    		String line = br.readLine();
+	    		log.debug("request line : {}", line);
+	    		
+	    		if(line == null) return;
+	    		
+	    		String[] tokens = line.split(" ");
+	    		
+	    		while(!line.equals("")) {
+	    			line = br.readLine();
+	    			log.debug("header: {}", line);
+	    		}
+	    		
             DataOutputStream dos = new DataOutputStream(out);
-//            byte[] body = "Hello World~~~!!!".getBytes();
+            byte[] body = Files.readAllBytes(new File("./webapp" + tokens[1]).toPath());
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
@@ -99,22 +94,6 @@ public class RequestHandler extends Thread {
 			if(paramMap != null) log.info("{}의 회원가입이 성공했습니다.", paramMap.get("userId"));
 		}
 		return requestUrl;
-	}
-
-	private String requestInfoPrint(InputStream in) throws IOException {
-//		InputStreamReader isr = new InputStreamReader(in);
-		BufferedReader br = new BufferedReader(new InputStreamReader(in));
-		String requestLine = "";
-		String firstLine = "";
-		int cnt = 0;
-		while((requestLine = br.readLine()) != null) {
-			if(requestLine.equals("")) break;
-			log.info("{}\n", requestLine);
-			if(cnt == 0 && requestLine.contains("HTTP")) {
-				firstLine = requestLine;
-			}
-		}
-		return firstLine;
 	}
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
