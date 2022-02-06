@@ -44,6 +44,7 @@ public class RequestHandler extends Thread {
 	    		if(line == null) return;
 	    		
 	    		String[] tokens = line.split(" ");
+	    		String method = tokens[0];
 	    		int contentLength = 0;
 	    		
 	    		while(!line.equals("")) {
@@ -66,16 +67,26 @@ public class RequestHandler extends Thread {
 	    			Map<String, String> params = HttpRequestUtils.parseQueryString(body);
 	    			User user = new User(params.get("userId"), params.get("password"), params.get("name"), params.get("email"));
 	    			log.debug("User : {}", user);
-	    			
 	    			url = "/index.html";
 	    			
 	    		} 
 	    		
     			DataOutputStream dos = new DataOutputStream(out);
     			byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
-    			response200Header(dos, body.length);
+    			if(method.equals("POST")) {
+    				try {
+    		            dos.writeBytes("HTTP/1.1 302 found \r\n");
+    		            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+    		            dos.writeBytes("Content-Length: " + body.length + "\r\n");
+    		            dos.writeBytes("Location: " + url + "\r\n");
+    		            dos.writeBytes("\r\n");
+    		        } catch (IOException e) {
+    		            log.error(e.getMessage());
+    		        }
+    			} else {
+    				response200Header(dos, body.length);
+    			}
     			responseBody(dos, body);
-	    		
 	    		
         } catch (IOException e) {
             log.error(e.getMessage());
