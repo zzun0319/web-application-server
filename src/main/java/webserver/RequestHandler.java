@@ -46,12 +46,16 @@ public class RequestHandler extends Thread {
 	    		String[] tokens = line.split(" ");
 	    		String method = tokens[0];
 	    		int contentLength = 0;
+	    		String cookie = "";
 	    		
 	    		while(!line.equals("")) {
 	    			log.debug("header: {}", line);
 	    			line = br.readLine();
 	    			if(line.contains("Content-Length")) {
 	    				contentLength = getContentLength(line);
+	    			}
+	    			if(line.contains("Cookie")) {
+	    				cookie = getCookie(line);
 	    			}
 	    		}
 	    		// 여기까지 br이 ""까지 읽음. Header와 Body사이의 ""
@@ -69,7 +73,7 @@ public class RequestHandler extends Thread {
 	    			log.debug("User : {}", user);
 	    			DataOutputStream dos = new DataOutputStream(out);
 	    			DataBase.addUser(user);
-	    			response302Header(dos);
+	    			response302Header(dos, "/index.html");
 	    			
 	    		} else if("/user/login".equals(url)) {
 	    			
@@ -82,6 +86,27 @@ public class RequestHandler extends Thread {
 	    			} else {
 	    				loginResponse(dos, false);
 	    			}
+	    		} else if("/user/list".equals(url)) {
+	    			
+	    			Map<String, String> cookieMap = HttpRequestUtils.parseCookies(cookie);
+	    			String logined = cookieMap.get("logined");
+	    			DataOutputStream dos = new DataOutputStream(out);
+	    			
+	    			if(logined != null && logined.equals("true")) {
+	    				
+	    				String result = "";
+	    				for (User u : DataBase.findAll()) {
+	    					String tmpUser = "ID: " + u.getUserId() + ", name: " + u.getName() + "<br>";
+	    					result += tmpUser;
+					}
+	    				byte[] body = result.getBytes();
+	    				response200Header(dos, body.length);
+		    			responseBody(dos, body);
+	    				
+	    			} else {
+	    				response302Header(dos, "/user/login.html");
+	    			}
+	    			
 	    		} else {
 	    			
 	    			DataOutputStream dos = new DataOutputStream(out);
@@ -108,14 +133,19 @@ public class RequestHandler extends Thread {
 		}
 	}
 
-	private void response302Header(DataOutputStream dos) {
+	private void response302Header(DataOutputStream dos, String path) {
 		try {
 		    dos.writeBytes("HTTP/1.1 302 Found \r\n");
-		    dos.writeBytes("Location: /index.html\r\n");
+		    dos.writeBytes("Location: " + path + "\r\n");
 		    dos.writeBytes("\r\n");
 		} catch (IOException e) {
 		    log.error(e.getMessage());
 		}
+	}
+	
+	private String getCookie(String line) {
+		String[] headerTokens = line.split(":");
+		return headerTokens[1].trim();
 	}
 
 	private int getContentLength(String line) {
