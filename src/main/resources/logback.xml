@@ -3,9 +3,16 @@
 <configuration>
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<layout class="ch.qos.logback.classic.PatternLayout">
-			<Pattern>%d{HH:mm:ss.SSS} [%-5level] [%thread] [%logger{36}] - %m%n</Pattern>
+			<Pattern>%d{HH:mm:ss.SSS} [%thread] [%-5level] [%logger{36}] - %m%n</Pattern>
 		</layout>
 	</appender>
+	
+	<!-- 
+	<logger name="db" level="DEBUG"/>
+	<logger name="model" level="DEBUG"/>
+	<logger name="util" level="DEBUG"/>
+	<logger name="webserver" level="DEBUG"/> 
+	-->
 	
 	<root level="DEBUG">
 		<appender-ref ref="STDOUT" />
