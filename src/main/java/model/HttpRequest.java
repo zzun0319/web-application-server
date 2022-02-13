@@ -27,7 +27,9 @@ public class HttpRequest {
 		
 		String line = "";
 		
-		try(BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"))) {
+		try {
+			
+			BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
 			
 			line = br.readLine();
 			if(line != null) {
