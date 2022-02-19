@@ -49,7 +49,7 @@ public class HttpRequest {
 			String cookieValue = getHeader("Cookie");
 			if(cookieValue != null) cookies = HttpRequestUtils.parseCookies(cookieValue);
 			
-			if(getMethod() == HttpMethod.POST) { 
+			if(getMethod().isPost()) { 
 				String body = IOUtils.readData(br, Integer.valueOf(headers.get("Content-Length")));
 				params = HttpRequestUtils.parseQueryString(body);
 			} else {

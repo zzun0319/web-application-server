@@ -23,7 +23,7 @@ public class RequestLine {
 		if(tokens.length != 3) throw new IllegalArgumentException(requestLine + "이 형식에 맞지 않습니다.");
 		
 		method = HttpMethod.valueOf(tokens[0]);
-		if(method == HttpMethod.POST) {
+		if(method.isPost()) {
 			path = tokens[1];
 			return;
 		}
