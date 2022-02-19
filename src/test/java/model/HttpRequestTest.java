@@ -52,7 +52,7 @@ HttpRequest httpRequest = null;
 		
 		assertEquals(httpRequest.getMethod(), "POST");
 		assertEquals(httpRequest.getPath(), "/user/create");
-		assertEquals(httpRequest.getHeader("Host"), "localhost:8080");
+		assertEquals(httpRequest.getHeader("Host"), "localhost:8080"); // ":"로 자르고 trim() 해서 그래.. ": " 이걸로 자르고 trim()하는 게 맞는 거 같음.
 		assertEquals(httpRequest.getHeader("Connection"), "keep-alive");
 		assertEquals(httpRequest.getHeader("Content-Length"), "38");
 		assertEquals(httpRequest.getHeader("Content-Type"), "application/x-www-form-urlencoded");
