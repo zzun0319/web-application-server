@@ -6,13 +6,14 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import enums.HttpMethod;
 import util.HttpRequestUtils;
 
 public class RequestLine {
 	
 	private static final Logger log = LoggerFactory.getLogger(RequestLine.class);
 	
-	private String method;
+	private HttpMethod method;
 	private String path;
 	private Map<String, String> params = new HashMap<String, String>();
 
@@ -21,8 +22,8 @@ public class RequestLine {
 		String[] tokens = requestLine.split(" ");
 		if(tokens.length != 3) throw new IllegalArgumentException(requestLine + "이 형식에 맞지 않습니다.");
 		
-		method = tokens[0];
-		if("POST".equals(method)) {
+		method = HttpMethod.valueOf(tokens[0]);
+		if(method == HttpMethod.POST) {
 			path = tokens[1];
 			return;
 		}
@@ -36,7 +37,7 @@ public class RequestLine {
 		}
 	}
 
-	public String getMethod() {
+	public HttpMethod getMethod() {
 		return method;
 	}
 

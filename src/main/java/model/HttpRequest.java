@@ -10,6 +10,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import enums.HttpMethod;
 import util.HttpRequestUtils;
 import util.IOUtils;
 
@@ -48,7 +49,7 @@ public class HttpRequest {
 			String cookieValue = getHeader("Cookie");
 			if(cookieValue != null) cookies = HttpRequestUtils.parseCookies(cookieValue);
 			
-			if("POST".equals(getMethod())) { 
+			if(getMethod() == HttpMethod.POST) { 
 				String body = IOUtils.readData(br, Integer.valueOf(headers.get("Content-Length")));
 				params = HttpRequestUtils.parseQueryString(body);
 			} else {
@@ -80,7 +81,7 @@ public class HttpRequest {
 //	}
 
 	// 테스트 그대로 다시 해볼 수 있으려면 메서드의 원형은 바뀌면 안 된다. 메서드명, 리턴값, 파라미터값 등.
-	public String getMethod() {
+	public HttpMethod getMethod() {
 		return requestLine.getMethod();
 	}
 

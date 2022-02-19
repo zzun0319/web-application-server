@@ -7,6 +7,8 @@ import java.io.FileNotFoundException;
 
 import org.junit.Test;
 
+import enums.HttpMethod;
+
 public class HttpRequestTest {
 	
 	private String resourcePath = "./src/test/resources/";
@@ -26,7 +28,7 @@ public class HttpRequestTest {
 		} 
 		
 		
-		assertEquals(httpRequest.getMethod(), "GET");
+		assertEquals(httpRequest.getMethod(), HttpMethod.GET);
 		assertEquals(httpRequest.getPath(), "/user/create");
 		assertEquals(httpRequest.getHeader("Host"), "localhost:8080");
 		assertEquals(httpRequest.getHeader("Connection"), "keep-alive");
@@ -39,7 +41,7 @@ public class HttpRequestTest {
 	@Test
 	public void 분리테스트POST() {
 		
-HttpRequest httpRequest = null;
+		HttpRequest httpRequest = null;
 		
 		try {
 			FileInputStream fis = new FileInputStream(resourcePath + "Http_POST.txt");
@@ -50,7 +52,7 @@ HttpRequest httpRequest = null;
 			e.printStackTrace();
 		} 
 		
-		assertEquals(httpRequest.getMethod(), "POST");
+		assertEquals(httpRequest.getMethod(), HttpMethod.POST);
 		assertEquals(httpRequest.getPath(), "/user/create");
 		assertEquals(httpRequest.getHeader("Host"), "localhost:8080"); // ":"로 자르고 trim() 해서 그래.. ": " 이걸로 자르고 trim()하는 게 맞는 거 같음.
 		assertEquals(httpRequest.getHeader("Connection"), "keep-alive");
