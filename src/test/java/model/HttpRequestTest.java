@@ -26,15 +26,14 @@ public class HttpRequestTest {
 		} 
 		
 		
-		assertEquals(httpRequest.getHttpMethod(), "GET");
-		assertEquals(httpRequest.getUrl(), "/user/create");
-		assertEquals(httpRequest.getBody(), null);
-		assertEquals(httpRequest.getHeaderValue("Host"), "localhost:8080");
-		assertEquals(httpRequest.getHeaderValue("Connection"), "keep-alive");
-		assertEquals(httpRequest.getHeaderValue("Accept"), "*/*");
-		assertEquals(httpRequest.getParamValue("userId"), "user1");
-		assertEquals(httpRequest.getParamValue("password"), "abc1234");
-		assertEquals(httpRequest.getParamValue("name"), "kim");
+		assertEquals(httpRequest.getMethod(), "GET");
+		assertEquals(httpRequest.getPath(), "/user/create");
+		assertEquals(httpRequest.getHeader("Host"), "localhost:8080");
+		assertEquals(httpRequest.getHeader("Connection"), "keep-alive");
+		assertEquals(httpRequest.getHeader("Accept"), "*/*");
+		assertEquals(httpRequest.getParameter("userId"), "user1");
+		assertEquals(httpRequest.getParameter("password"), "abc1234");
+		assertEquals(httpRequest.getParameter("name"), "kim");
 	}
 	
 	@Test
@@ -51,17 +50,16 @@ HttpRequest httpRequest = null;
 			e.printStackTrace();
 		} 
 		
-		assertEquals(httpRequest.getHttpMethod(), "POST");
-		assertEquals(httpRequest.getUrl(), "/user/create");
-		assertEquals(httpRequest.getBody(), "userId=user1&password=abc1234&name=kim");
-		assertEquals(httpRequest.getHeaderValue("Host"), "localhost:8080");
-		assertEquals(httpRequest.getHeaderValue("Connection"), "keep-alive");
-		assertEquals(httpRequest.getHeaderValue("Content-Length"), "38");
-		assertEquals(httpRequest.getHeaderValue("Content-Type"), "application/x-www-form-urlencoded");
-		assertEquals(httpRequest.getHeaderValue("Accept"), "*/*");
-		assertEquals(httpRequest.getParamValue("userId"), "user1");
-		assertEquals(httpRequest.getParamValue("password"), "abc1234");
-		assertEquals(httpRequest.getParamValue("name"), "kim");
+		assertEquals(httpRequest.getMethod(), "POST");
+		assertEquals(httpRequest.getPath(), "/user/create");
+		assertEquals(httpRequest.getHeader("Host"), "localhost:8080");
+		assertEquals(httpRequest.getHeader("Connection"), "keep-alive");
+		assertEquals(httpRequest.getHeader("Content-Length"), "38");
+		assertEquals(httpRequest.getHeader("Content-Type"), "application/x-www-form-urlencoded");
+		assertEquals(httpRequest.getHeader("Accept"), "*/*");
+		assertEquals(httpRequest.getParameter("userId"), "user1");
+		assertEquals(httpRequest.getParameter("password"), "abc1234");
+		assertEquals(httpRequest.getParameter("name"), "kim");
 		
 	}
 

@@ -39,7 +39,7 @@ public class RequestHandler_v3 extends Thread {
         	
         		HttpRequest httpRequest = new HttpRequest(in);
 	    		
-	    		String url = httpRequest.getUrl();
+	    		String url = httpRequest.getPath();
 	    		log.debug("Request URL: {}", url);
 	    		
 	    		DataOutputStream dos = new DataOutputStream(out);
