@@ -49,7 +49,7 @@ public class HttpRequest {
 			log.debug("######url: {}", url);
 			
 			line = br.readLine();
-			while(!"".equals(line)) {
+			while(!"".equals(line) && line != null) {
 //				log.debug("line to process: {}", line);
 				Pair pair = HttpRequestUtils.parseHeader(line);
 				headers.put(pair.getKey(), pair.getValue());
