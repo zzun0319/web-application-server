@@ -10,7 +10,7 @@ public class UserListController extends AbstractController {
 	@Override
 	public void service(HttpRequest request, HttpResponse response) {
 		
-		String cookieLoginedStr = request.getCookieValue("logined");
+		String cookieLoginedStr = request.getCookie("logined");
 		boolean logined = (cookieLoginedStr != null) ? Boolean.parseBoolean(cookieLoginedStr) : false;
 		
 		if(logined) {

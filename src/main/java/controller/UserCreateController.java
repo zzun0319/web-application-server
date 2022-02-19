@@ -1,7 +1,5 @@
 package controller;
 
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,11 +15,7 @@ public class UserCreateController extends AbstractController {
 	@Override
 	public void service(HttpRequest request, HttpResponse response) {
 		
-		Map<String, String> params = request.getParamMap();
-		
-		if(params.size() == 0) return;
-		
-		User user = new User(params.get("userId"), params.get("password"), params.get("name"), params.get("email"));
+		User user = new User(request.getParameter("userId"), request.getParameter("password"), request.getParameter("name"), request.getParameter("email"));
 		log.debug("User : {}", user);
 		
 		DataBase.addUser(user);
