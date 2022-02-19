@@ -57,10 +57,14 @@ public class HttpRequest {
 //				log.debug("next line: {}", line);
 			}
 			
+			String cookieValue = getHeaderValue("Cookie");
+			if(cookieValue != null) cookieMap = HttpRequestUtils.parseCookies(cookieValue);
+			
 			if(httpMethod.equals("GET") && url.contains("?")) {
 				String[] urlParts = parts[1].split("\\?");
 				url = urlParts[0];
 				paramMap = HttpRequestUtils.parseQueryString(urlParts[1]);
+				return;
 			}
 			
 			if(httpMethod.equals("POST")) { 
@@ -69,9 +73,6 @@ public class HttpRequest {
 				body = IOUtils.readData(br, Integer.valueOf(getHeaderValue("Content-Length")));
 				paramMap = HttpRequestUtils.parseQueryString(body);
 			}
-			
-			String cookieValue = getHeaderValue("Cookie");
-			if(cookieValue != null) cookieMap = HttpRequestUtils.parseCookies(cookieValue);
 			
 		} catch (IOException e) {
 			e.printStackTrace();
