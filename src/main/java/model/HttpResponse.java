@@ -3,6 +3,7 @@ package model;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,8 +18,8 @@ public class HttpResponse {
 	private DataOutputStream dos;
 	private Map<String, String> headers = new HashMap<>();
 	
-	public HttpResponse(DataOutputStream dos) {
-		this.dos = dos;
+	public HttpResponse(OutputStream out) {
+		this.dos = new DataOutputStream(out);
 	}
 	
 	public void addHeader(String key, String value) {
@@ -29,18 +30,17 @@ public class HttpResponse {
 
 		try {
 			
-			dos.writeBytes("HTTP/1.1 200 OK \r\n");
-			
 			byte[] body = Files.readAllBytes(new File("./webapp" + path).toPath());
-			dos.writeBytes("Content-Length: " + body.length + "\r\n");
-			
-			for (String key : headers.keySet()) {
-				dos.writeBytes(key + ": " + headers.get(key) + "\r\n");
+			if(path.endsWith(".css")) {
+				headers.put("Content-Type", "text/css");
+			} else if(path.endsWith(".js")) {
+				headers.put("Content-Type", "application/javascript");
+			} else {
+				headers.put("Content-Type", "text/html;charset=utf-8");
 			}
-			dos.writeBytes("\r\n");
-
-			dos.write(body, 0, body.length);
-			dos.flush();
+			headers.put("Content-Length", body.length + "");
+			response200Header(body.length);
+			responseBody(body);
 
 		} catch (IOException e) {
 			log.error(e.getMessage());
@@ -48,41 +48,51 @@ public class HttpResponse {
 
 	}
 	
-	public void forward(byte[] body) {
-
+	public void forwardBody(String body) {
+		byte[] contents = body.getBytes();
+		headers.put("Content-Type", "text/html;charset=utf-8");
+		headers.put("Content-Length", contents.length + "");
+		response200Header(contents.length);
+		responseBody(contents);
+	}
+	
+	public void sendRedirect(String redirectUrl) {
 		try {
 			
+			dos.writeBytes("HTTP/1.1 302 Found \r\n");
+			processHeaders();
+			dos.writeBytes("Location: " + redirectUrl + "\r\n");
+			dos.writeBytes("\r\n");
+			
+		} catch (IOException e) {
+			log.error(e.getMessage());
+		}
+	}
+
+	private void responseBody(byte[] body) {
+		try {
+			dos.write(body, 0, body.length);
+			dos.writeBytes("\r\n");
+			dos.flush();
+		} catch (IOException e) {
+			log.error(e.getMessage());
+		}
+	}
+
+	private void response200Header(int lengthOfBodyContent) {
+		try {
 			dos.writeBytes("HTTP/1.1 200 OK \r\n");
-			
-			dos.writeBytes("Content-Length: " + body.length + "\r\n");
-			
-			for (String key : headers.keySet()) {
-				dos.writeBytes(key + ": " + headers.get(key) + "\r\n");
-			}
+			processHeaders();
 			dos.writeBytes("\r\n");
-
-			dos.write(body, 0, body.length);
-			dos.flush();
-
 		} catch (IOException e) {
 			log.error(e.getMessage());
 		}
-
 	}
-	
-	public void sendRedirect(String location) {
-		try {
-		    dos.writeBytes("HTTP/1.1 302 Found \r\n");
-		    
-		    dos.writeBytes("Location: " + location + "\r\n");
-		    for (String key : headers.keySet()) {
-				dos.writeBytes(key + ": " + headers.get(key) + "\r\n");
-			}
-			dos.writeBytes("\r\n");
-			
-		} catch (IOException e) {
-		    log.error(e.getMessage());
+
+	private void processHeaders() throws IOException {
+		for (String key : headers.keySet()) {
+			dos.writeBytes(key + ": " + headers.get(key) + "\r\n");
 		}
 	}
-
+	
 }

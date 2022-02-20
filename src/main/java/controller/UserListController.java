@@ -15,13 +15,17 @@ public class UserListController extends AbstractController {
 		
 		if(logined) {
 			
-			String result = "";
+			StringBuilder sb = new StringBuilder();
+			sb.append("<body><table boarder='1'>");
 			for (User u : DataBase.findAll()) {
-				String tmpUser = "ID: " + u.getUserId() + ", name: " + u.getName() + "\r\n";
-				result += tmpUser;
-		}
-			byte[] body = result.getBytes();
-			response.forward(body);
+				sb.append("<tr>");
+				sb.append("<td>" + u.getUserId() + "</td>");
+				sb.append("<td>" + u.getName() + "</td>");
+				sb.append("<td>" + u.getEmail() + "</td>");
+				sb.append("</tr>");
+			}
+			sb.append("</table></body>");
+			response.forwardBody(sb.toString());
 			
 		} else {
 			response.sendRedirect("/user/login.html");
