@@ -7,6 +7,7 @@ import controller.Controller;
 import controller.UserCreateController;
 import controller.UserListController;
 import controller.UserLoginController;
+import controller.UserUpdateController;
 
 public class RequestMapping {
 	
@@ -16,6 +17,7 @@ public class RequestMapping {
 		controllers.put("/user/create", new UserCreateController());
 		controllers.put("/user/login", new UserLoginController());
 		controllers.put("/user/list", new UserListController());
+		controllers.put("/user/update", new UserUpdateController());
 	}
 	
 	public static Controller getController(String requestUrl) {

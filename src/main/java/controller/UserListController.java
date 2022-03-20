@@ -8,8 +8,7 @@ import model.User;
 public class UserListController extends AbstractController {
 
 	@Override
-	public void service(HttpRequest request, HttpResponse response) {
-		
+	public void doGet(HttpRequest request, HttpResponse response) {
 		String cookieLoginedStr = request.getCookie("logined");
 		boolean logined = (cookieLoginedStr != null) ? Boolean.parseBoolean(cookieLoginedStr) : false;
 		
@@ -30,7 +29,6 @@ public class UserListController extends AbstractController {
 		} else {
 			response.sendRedirect("/user/login.html");
 		}
-		
 	}
 
 }

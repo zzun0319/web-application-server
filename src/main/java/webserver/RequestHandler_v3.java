@@ -14,8 +14,8 @@ import model.HttpResponse;
 import util.RequestMapping;
 
 public class RequestHandler_v3 extends Thread {
-    private static final Logger log = LoggerFactory.getLogger(RequestHandler_v3.class);
-
+	private static final Logger log = LoggerFactory.getLogger(RequestHandler_v3.class);
+	
     private Socket connection;
 
     public RequestHandler_v3(Socket connectionSocket) {
@@ -36,6 +36,14 @@ public class RequestHandler_v3 extends Thread {
 	    		
 	    		String path = request.getPath();
 	    		log.debug("Request URL: {}", path);
+	    		
+	    		String sessionId = request.getCookie("JSESSIONID");
+				if(sessionId == null) {
+	    			response.sendRedirect("/index.html");
+	    			return;
+	    		}
+				
+				log.debug("sessionId: {}", sessionId);
 	    		
 	    		Controller controller = RequestMapping.getController(path);
 	    		if(controller == null){
