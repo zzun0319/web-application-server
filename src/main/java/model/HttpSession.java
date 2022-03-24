@@ -25,7 +25,7 @@ public class HttpSession {
 	}
 	
 	public void invalidate() {
-		attributes.clear();
+		HttpSessions.removeSession(id);
 	}
 	
 }

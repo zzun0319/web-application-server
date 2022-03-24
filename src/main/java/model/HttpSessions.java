@@ -14,5 +14,9 @@ public class HttpSessions {
 	public static void addSession(String sessionId, HttpSession session) {
 		sessions.put(sessionId, session);
 	}
+	
+	public static void removeSession(String sessionId) {
+		sessions.remove(sessionId);
+	}
 
 }

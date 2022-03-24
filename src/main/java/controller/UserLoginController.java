@@ -12,7 +12,7 @@ import model.User;
 public class UserLoginController extends AbstractController {
 
 	@Override
-	public void service(HttpRequest request, HttpResponse response) {
+	public void doPost(HttpRequest request, HttpResponse response) {
 		
 		User findUser = DataBase.findUserById(request.getParameter("userId"));
 		
@@ -22,7 +22,7 @@ public class UserLoginController extends AbstractController {
 		} else {
 			String sessionId = UUID.randomUUID().toString();
 			HttpSession session = new HttpSession(sessionId);
-			session.setAttribute(sessionId, findUser);
+			session.setAttribute("user", findUser);
 			HttpSessions.addSession(sessionId, session);
 //			response.addHeader("Set-Cookie", "logined=true");
 			response.addHeader("Set-Cookie", "JSESSIONID=" + sessionId);
